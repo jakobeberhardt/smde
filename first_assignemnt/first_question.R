@@ -90,7 +90,7 @@ chisq.test(filtered_data$TypeName, filtered_data$TouchScreen)
 
 ### f) Check the distribution of Price first for all observations then for
 ###    subgroups of type of laptop in the data set created in section (b).
-###    Does it follow a normal distribution? (15p)
+###    Does it follow a normal distribution?
 
 # All data
 hist(data$Price,
