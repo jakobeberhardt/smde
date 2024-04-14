@@ -169,16 +169,16 @@ dwtest(model)
 ### whether the interaction of two term is significant. Interpret your findings. (Do not forget to
 ### confirm the assumptions!) (25 p)
 
-# As demonstrated previously (section xxx) price is normal. Hence, we proceed to
+# As demonstrated previously (section b) price is normal. Hence, we proceed to
 # use anova to verify the interaction of the two terms.
 
 model_interaction <- aov(filtered_data$Price ~ 
-                         filtered_data$Cpu_brand*filtered_data$TouchScreen)
-
-summary(model_interaction)
+                           filtered_data$Cpu_brand*filtered_data$TouchScreen)
 
 plot(model_interaction, 2)
-library(car)
 leveneTest(model_interaction)
 
-# As we can see through the summary of model, brand and touchscreen have a highly significant effect (***) on the price.
+# On the qqplot we can see that the values are not following a normal distribution. Furthermore if we check the Levene's test on the interaction model we see that
+# we have enough evidence to reject the null hypothesis of homoscedasticity, so the assumption is not fulfilled
+
+# As we fail to verify the assumptions we can not consider the ANOVA test for further conclusions.
