@@ -1,0 +1,16 @@
+---
+title: "SMDE First Assignment"
+author:
+- Pol Segura Retana
+- Jakob Eberhardt
+- Stefano Petrilli
+output: pdf_document
+date: "2024-04-02"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+As many tests require that the observations are independent, we will assume
+that this propert is true for the given dataset.
