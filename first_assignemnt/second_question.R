@@ -137,7 +137,3 @@ model_interaction <- aov(filtered_data$Price ~ filtered_data$Cpu_brand*filtered_
 summary(model_interaction)
 
 # As we can see through the summary of model, brand and touchscreen have a highly significant effect (***) on the price.
-
-
-
-# Both tests conclude that the residuals follow a normal distribution
