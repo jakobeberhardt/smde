@@ -2,6 +2,7 @@
 ### SMDE Assignment 1 Part 2 ###
 ################################
 library("lmtest")
+library("car")
 
 ### a) Read the laptop price data set and create a sub dataset including only
 ###    laptop brands “Dell”, “Acer” and “Hp”. Summarize the variable “company”
@@ -153,7 +154,7 @@ pairwise.t.test(filtered_data$Price,
 plot(model, 2)
 # According to this plot we could state that the residuals distribution is 
 # normal, however we can further check this with a Levene's test.
-library(car)
+
 leveneTest(model)
 # The p-value obtained is 0.067, as it is greater than alpha we fail to reject the null hypothesis of homoscedasticity, so the assumption is fulfilled.
 
