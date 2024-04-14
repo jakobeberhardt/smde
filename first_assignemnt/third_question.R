@@ -43,12 +43,31 @@ plot(ow_model)
 summary(ow_model)
 # Adjusted R-squared: 0.02215
 
+# Assumptions check 
+
+# Linearity: as p-value of weight in the Linear Model is significant (***), we can state that there is a linear correlation between Price and Weight.
+# Homoscedasticity:
+bptest(ow_model)
+# As the p-val<0.05 we have enough evidence for rejecting the null hypothesis, so we can state that the Homoscedasticity assumption is not fulfilled.
+
+plot(ow_model, 2)
+shapiro.test(ow_model$residuals)
+
+
 # Only Ppi
 op_model <- lm(Price ~ Ppi, data = data)
 summary(op_model)
 # Adjusted R-squared: 0.2305
 
+# Assumptions check 
+
+# Linearity: as p-value of weight in the Linear Model is significant (***), we can state that there is a linear correlation between Price and Ppi.
+# Homoscedasticity:
+bptest(op_model)
+# As the p-val>0.05 we have enough evidence for accepting the null hypothesis, so we can state that the Homoscedasticity assumption is fulfilled.
+
 # In this case we can see that Ppi is a better predictor than Weight for Price.
+
 
 # b) Fit a multivariate linear regression model with two (numerical) independent variables. Choose
 # the most significant regression model with two predictors. (Transform the variables if it is
@@ -60,11 +79,23 @@ lm_model <- lm(Price ~ Weight + Ppi, data = data)
 summary(lm_model)
 # Adjusted R-squared: 0.3336
 
+# Assumptions check 
+
+# Linearity: as p-value of Weight, Ppi and the interaction in the Linear Model is significant (***), we can state that there is a linear correlation between Price and Weight.
+# Homoscedasticity:
+bptest(lm_model)
+# As the p-val<0.05 we have enough evidence for rejecting the null hypothesis, so we can state that the Homoscedasticity assumption is not fulfilled.
+
 # Log(weight + Ppi)
 log_var <- log(data$Weight, data$Ppi)
 log_model <- lm(Price ~ log_var, data = data)
 summary(log_model)
 # Adjusted R-squared: -0.0007012
+
+# Assumptions check 
+
+# Linearity: as p-value of the logged variables in the Linear Model is not significant, we can state that there is not a linear correlation between Price and logged variables.
+
 
 # With this values we could state that the best model for predicting Price is Weight+Ppi, but we can do a further checking with a partial F-test.
 
