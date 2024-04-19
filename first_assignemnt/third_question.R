@@ -18,7 +18,6 @@ col_classes <- c("factor",    # Company
 #data <- read.csv(file_path, colClasses = col_classes)
 data <- read.csv("Downloads/laptop_data_cleaned.csv", colClasses = col_classes)
 
-
 # a) Consider the numerical variables in the data set and find the best simple linear regression
 # model to predict the prices (Test the assumptions and use transformations if it is required.)
 # Explain why the model you find is the best simple linear regression model and interpret the
@@ -141,6 +140,7 @@ vif(ps_model)
 # For the partial F-tests we will use ANOVA:
 
 anova(ps_model, os_model)
+
 # The ANOVA test suggests that Model 1 provides a significantly better fit to the data compared to Model 2.
 # This conclusion is based on the significantly lower residual sum of squares (RSS) and the associated F-statistic with 
 # a very low p-value (***), indicating strong evidence against the null hypothesis.
@@ -149,9 +149,6 @@ anova(ps_model, os_model)
 # to add factors one by one to the previous model and decide based on the results.) Interpret
 # the coefficients and overall summary of the model. Test the model in section (b) with the
 # model that has an additional factor. Which one would you choose? Why? (35p)
-
-# we have to do anova that is doing partial F-tests to compare single with full models
-# In ANOVA, the null hypothesis is that there is no difference among group means
 
 for (fact in c("Company", "TypeName", "Ram", "TouchScreen", "Ips", "Cpu_brand", "HDD", "Gpu_brand", "Os")) {
   formula_str <- paste("Price ~ Ppi + SSD +", fact)  # Create the formula as a string
@@ -171,9 +168,57 @@ for (fact in c("Company", "TypeName", "Ram", "TouchScreen", "Ips", "Cpu_brand", 
 # Gpu_brand: 0.5494
 # OS: 0.5056
 
-# With these results we could state that Cpu_brand is the factor that helps more to 
+# With these results we could state that Cpu_brand is the factor that helps more to explain the Price 
 
+psc_model <- lm(Price ~ Ppi + SSD + Cpu_brand, data = data)
+
+## Assumptions check 
+
+## Homoscedasticity:
+bptest(psc_model)
+# As the p-val(6.755e-14)<0.05 we have enough evidence for rejecting the null hypothesis, so we can state that the Homoscedasticity assumption is not fulfilled.
+
+# As this model (Cpu_brand) fails the assumption of homoscedasticity we will continue the analysis with the second best explanatory factor: Ram
+
+psr_model <- lm(Price ~ Ppi + SSD + Ram, data = data)
+
+## Assumptions check 
+
+## Homoscedasticity:
+bptest(psr_model)
+# As the p-val(2.659e-05)<0.05 we have enough evidence for rejecting the null hypothesis, so we can state that the Homoscedasticity assumption is not fulfilled.
+
+# As this model (RAM) fails the assumption of homoscedasticity we will continue the analysis with the second best explanatory factor: TypeName
+
+pst_model <- lm(Price ~ Ppi + SSD + TypeName, data = data)
+
+# As this model (TypeName) fails the assumption of homoscedasticity we will continue the analysis with the second best explanatory factor: Gpu_brand
+
+psg_model <- lm(Price ~ Ppi + SSD + Gpu_brand, data = data)
+
+## Assumptions check 
+
+## Homoscedasticity:
+bptest(psg_model)
+# As the p-val(0.6878)>0.05 we have enough evidence for accepting the null hypothesis, so we can state that the Homoscedasticity assumption is fulfilled.
+
+## Normality of the residuals
+plot(psg_model, 2)
+shapiro.test(psg_model$residuals)
+# The assumption of normality of the residuals is fulfilled as the p-val(0.07783)>0.05.
+
+## No Multicolinearity
+# In order to test correlation we can check the variance inflation factor
+vif(psg_model)
+# The correlation between the three independent variables is less than 1.2, we can state that the assumption of not multicolinearity between the independent variables is fulfilled.
+
+# Now that we have chosen the most suitable factor to include in the model, we can compare the without-factor and with-factor models with ANOVA.
+
+anova(ps_model, psg_model)
+
+# The ANOVA test suggests that Model 2 provides a significantly better fit to the data compared to Model 1, 
+# what means that adding the factor Gpu_brand is better for explaining the variation in the response variable 'Price'.
+# This conclusion is based on the significantly lower residual sum of squares (RSS) and the associated F-statistic with 
+# a very low p-value (***), indicating strong evidence against the null hypothesis.
 
 # d) Test the validity of the final model. (15p)
-
-
