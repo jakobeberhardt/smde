@@ -119,9 +119,6 @@ summary(model)
 
 # We can apply a TukeyHSD post-hoc test to check which and how groups differ
 # from each other
-# We can apply a TukeyHSD post-hoc test to check which and how groups differ from each other
-# First we need to check the assumption, that the variances between groups are equal.
-# To this end, we use a f-test:
 TukeyHSD(model)
 
 # Interpretation of the Tukey test:
@@ -167,6 +164,7 @@ plot(model, 2)
 # normal, however we can further check this with a Levene's test.
 
 leveneTest(model)
+
 # The p-value obtained is 0.067, as it is greater than alpha we fail to reject
 # the null hypothesis of homoscedasticity, so the assumption is fulfilled.
 
