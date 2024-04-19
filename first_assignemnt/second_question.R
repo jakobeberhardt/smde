@@ -60,14 +60,13 @@ shapiro.test(filtered_data$Weight)
 # We use an ANOVA test in order to analyze the relationships between brand and its price and weight.
 # To this end, we have to check the respective assumptions of ANOVA:
 # 1 - The distribution of the population must be normal.
-# 2 - Homoscedasticity: The variance of the residuals should be constant across 
-#     all levels of the independent variables.
+# 2 - Homogeneity of variances: Equal variance among the groups.
 # 3 - Observations are independent.
 #     As stated in the disclaimer, in the general case it is not possible to verify
 #     this, but, as this is a regression analysis, the Durbin-Watson test can be
 #     used on the residuals to detect the presence of autocorrelation.
 
-# Normality has to be verified on the input data while assumption homosedasticity
+# Normality has to be verified on the input data while the assumptions of homogeneity of variances
 # and independence of observations have to be verified on the residuals (see c).
 
 # We have seen that weight variable is not normally distributed.
@@ -110,8 +109,13 @@ shapiro.test(log_clean_data)
 # Now we will proceed with performing the ANOVA test.
 model <- aov(filtered_data$Price ~ filtered_data$Company)
 summary(model)
+# With a p-value of 2e-16, we have enough evidence to reject 
+# the null-hypothesis. This means at least one mean is significantly 
+# different. 
 
 # We can apply a TukeyHSD post-hoc test to check which and how groups differ from each other
+# First we need to check the assumption, that the variances between groups are equal.
+# To this end, we use a f-test:
 TukeyHSD(model)
 
 # Interpretation of the Tukey test:
@@ -148,9 +152,9 @@ pairwise.t.test(filtered_data$Price,
 # difference in prices between these two companies, but not as extreme as the 
 # differences observed between Acer and each of Dell and HP.
 
-# Lastly, we will verify the remaining assumptions which are homoscedasticity and independence of observation.
+# Lastly, we will verify the remaining assumptions which are homogeneity of variances and independence of observation.
 
-# In order to check homoscedasticity we can use a qqplot:
+# In order to check homogeneity of variances we can use a qqplot:
 plot(model, 2)
 # According to this plot we could state that the residuals distribution is 
 # normal, however we can further check this with a Levene's test.
