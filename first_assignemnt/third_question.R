@@ -19,9 +19,6 @@ col_classes <- c("factor",    # Company
 data <- read.csv("Downloads/laptop_data_cleaned.csv", colClasses = col_classes)
 
 
-# a) maybe the best model its the logarithm of all the numerical variables
-# b) partial F-test for making the decision for sure
-
 # a) Consider the numerical variables in the data set and find the best simple linear regression
 # model to predict the prices (Test the assumptions and use transformations if it is required.)
 # Explain why the model you find is the best simple linear regression model and interpret the
