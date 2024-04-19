@@ -2,8 +2,6 @@
 ### SMDE Assignment 1 Part 1 ###
 ################################
 
-
-
 ### a) Import data set to R assigning the type of each variable correctly.
 file_path <- "./data/laptop_data_cleaned.csv"
 col_classes <- c("factor",    # Company
@@ -16,7 +14,7 @@ col_classes <- c("factor",    # Company
                  "numeric",   # Ppi
                  "factor",    # Cpu_brand
                  "factor",    # HDD
-                 "factor",    # SSD
+                 "numeric",    # SSD
                  "factor",    # Gpu_brand
                  "factor")    # Os
 
@@ -46,7 +44,6 @@ table(filtered_data$TouchScreen)
 table(filtered_data$Ips)
 table(filtered_data$Cpu_brand)
 table(filtered_data$HDD)
-table(filtered_data$SSD)
 table(filtered_data$Gpu_brand)
 table(filtered_data$Os)
 
