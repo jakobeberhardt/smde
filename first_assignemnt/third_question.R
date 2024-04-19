@@ -269,5 +269,41 @@ anova(ps_model, psg_model)
 
 # d) Test the validity of the final model. (15p)
 
-# To verify how accurate the model is, we take a subset of 25 laptops in our
+# Let's verify graphically how good the model is by using a visual analysis
+predictions <- predict(psg_model, data)
+
+# Create a plot
+plot(data$Price,
+     predictions,
+     xlab = "Actual Prices",
+     ylab = "Predicted Prices",
+     main = "Actual vs Predicted Prices")
+abline(0, 1)
+
+
+# Create a residuals vs fitted values plot
+plot(fitted(psg_model),
+     residuals(psg_model),
+     xlab = "Fitted Values",
+     ylab = "Residuals",
+     main = "Residuals vs Fitted Values")
+abline(h = 0, lty = 2)
+
+# To verify how accurate the model is, we take a subset of 10 laptops in our
 # dataset and verify how accurate the model is.
+
+set.seed(123)
+random_rows <- sample(nrow(data), 10)
+subset_data <- data[random_rows, ]
+
+predicted_prices <- predict(psg_model, newdata = subset_data)
+differences <- predicted_prices - subset_data$Price
+
+results <- data.frame(
+  Predicted = predicted_prices,
+  Actual = subset_data$Price,
+  Difference = differences,
+  Percentage = (results$Difference / results$Actual) * 100
+)
+
+print(results)
