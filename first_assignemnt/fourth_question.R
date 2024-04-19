@@ -1,6 +1,8 @@
 ############################# PART 4
 
 library(FactoMineR)
+library(corrplot)
+
 data(decathlon)
 
 # 1) Define a PCA for the decathlon dataset and discuss why the model you own works well (or not) looking
@@ -8,13 +10,21 @@ data(decathlon)
 # individuals charts to understand the relations between the different variables of interest and individuals
 # scores on the dimensions
 
-# Before performing the PCA we will check which Principal Components should we use with KMO test. 
-# The Kaiser-Meyer-Olkin (KMO) represents the degree to which each observed variable is predicted by the other variables in the 
+# Before performing the PCA we will check which Principal Components should we
+# use with KMO test. The Kaiser-Meyer-Olkin (KMO) represents the degree to which
+# each observed variable is predicted by the other variables in the
 # dataset and with this indicates the suitability for factor analysis.
 
-# As the variable "Competition" is not numeric, we can not use it for the PCA so we will remove it from the dataset.
-decathlon <- decathlon[, -13]
+# As the variable "Competition" is not numerical, we can not use it for the PCA
+# so we remove it from the dataset. We also omit "Rank" as it is the variable
+# are aiming to predict.
+normalized_data <- decathlon[, -13]
+normalized_data <- normalized_data[, -11]
 
+# Next we normalize and center the date of the remaining colums
+normalized_data <- as.data.frame(scale(decathlon))
+
+# If we check the KMO, the data is clearly not yet sutiable for a PCA as it yields 0.1154019.
 kmo <- function(x)
 {
   x <- subset(x, complete.cases(x))       # Omit missing values
@@ -26,18 +36,28 @@ kmo <- function(x)
   diag(r2) <- diag(p2) <- 0               # Delete diagonal elements
   KMO <- sum(r2)/(sum(r2)+sum(p2))
   MSA <- colSums(r2)/(colSums(r2)+colSums(p2))
-  return(list(KMO=KMO, MSA=MSA))
+  return(list(KMO = KMO, MSA = MSA))
 }
+kmo(normalized_data)
 
-kmo(decathlon)
+correlation_matrix <- cor(normalized_data)
+corrplot(correlation_matrix, method = "circle")
 
-decathlon <- decathlon[, -11]
+# Looking at the correlation matrix, we can see the problem. Some discipilness
+# have positivly correlated while others are negativly correlate. To adress
+# this, we change the directions of negative ones.
+normalized_data$`100m` <- max(normalized_data$`100m`) - normalized_data$`100m`
+normalized_data$`400m` <- max(normalized_data$`400m`) - normalized_data$`400m`
+normalized_data$`110m.hurdle` <- max(normalized_data$`110m.hurdle`) - normalized_data$`110m.hurdle`
+normalized_data$`1500m` <- max(normalized_data$`1500m`) - normalized_data$`1500m`
 
-kmo(decathlon)
+correlation_matrix <- cor(normalized_data)
+corrplot(correlation_matrix, method = "circle")
+kmo(normalized_data)
 
-pca <- PCA(decathlon)
+# pca <- PCA(normalized_data)
 
-
+# print(pca)
 
 # we can use KMO to test which PC should we use in a PCA, value should be 80 more or less. Nihan uses a function KMO from a professor (search)
 
