@@ -1,5 +1,8 @@
 ##################### PART 3
 
+library("lmtest")
+library("car")
+
 file_path <- "./data/laptop_data_cleaned.csv"
 col_classes <- c("factor",    # Company
                  "factor",    # TypeName
@@ -16,7 +19,7 @@ col_classes <- c("factor",    # Company
                  "factor")    # Os
 
 #data <- read.csv(file_path, colClasses = col_classes)
-data <- read.csv("Downloads/laptop_data_cleaned.csv", colClasses = col_classes)
+data <- read.csv(file_path, colClasses = col_classes)
 
 # a) Consider the numerical variables in the data set and find the best simple linear regression
 # model to predict the prices (Test the assumptions and use transformations if it is required.)
@@ -30,6 +33,10 @@ data <- read.csv("Downloads/laptop_data_cleaned.csv", colClasses = col_classes)
 # levels of the independent variable(s). Normality of Residuals: The residuals
 # (the differences between observed and predicted values) should be normally
 # distributed.
+# Normality of residuals: The residual (the difference between observed and
+# predicted values) should be normally distributed.
+# Independence of erros: The residual (the difference between observed and
+# predicted values) should be independent.
 
 # In order to check which model is better we can check the Adjusted R-squared
 # using summary(). The R-squared value is the amount of variance explained by
@@ -76,7 +83,8 @@ bptest(op_model)
 plot(op_model, 2)
 shapiro.test(op_model$residuals)
 # In this case the p-val(0.223)>0.05 so we have enough evidence for accepting
-# the null hypothesis, the assumption of normality in the residuals is fulfilled.
+# the null hypothesis, the assumption of normality in the residuals is
+# fulfilled.
 
 ### Only SSD
 os_model <- lm(Price ~ SSD, data = data)
@@ -158,6 +166,12 @@ shapiro.test(ps_model$residuals)
 vif(ps_model)
 # The correlation between Ppi and SSD is 1.33, we can state that the assumption
 # of not multicolinearity between the independent variables (Ppi and SSD) is fulfilled
+
+## Independence of erros
+# We can use DurbinWatson test to verify the independence of errors
+dwtest(ps_model)
+# The test yields a DW value equal to 2.05 means which confirms the independence
+# of errors
 
 # With this results we could state that the best model for predicting Price is
 # Ppi+SSD, as it has the higher Adjusted R-squared. We can do a further checking
@@ -255,11 +269,15 @@ vif(psg_model)
 # can state that the assumption of not multicolinearity between the independent
 # variables is fulfilled.
 
+## Independence of erros
+# We can use DurbinWatson test to verify the independence of errors
+dwtest(psg_model)
+# The test yields a DW value equal to 1.99 means which confirms the independence
+# of errors
+
 # Now that we have chosen the most suitable factor to include in the model, we
 # can compare the without-factor and with-factor models with ANOVA.
 
-
-# TODO: test with dwtest
 anova(ps_model, psg_model)
 
 # The ANOVA test suggests that Model 2 provides a significantly better fit to
@@ -305,7 +323,8 @@ results <- data.frame(
   Predicted = predicted_prices,
   Actual = subset_data$Price,
   Difference = differences,
-  Percentage = (results$Difference / results$Actual) * 100
+  Percentage = (differences / subset_data$Price) * 100
 )
 
 print(results)
+
