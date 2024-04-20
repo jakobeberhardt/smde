@@ -122,6 +122,7 @@ plot(pca$eig[, 3],
      type = "b",
      ylim = c(0, max(pca$eig[, 3])),
      ylab = "Cumulative Proportion of variance explained")
+par(mfrow = c(1, 1))
 
 # Moreover, we want to know in which component are the variables explained the
 # most. We can see it through the cosen of the models.
@@ -175,3 +176,28 @@ dwtest(model)
 # The test yields a DW value equal to 1.70 means which confirms the independence
 # of errors
 
+# Let's verify how good is the model.extract(
+
+# First we verify it graphically how good the model is by using a visual
+# analysis
+predictions <- predict(model, decathlon)
+
+# Create a plot
+plot(decathlon$Points,
+     predictions,
+     xlab = "Actual Rank",
+     ylab = "Predicted Rank",
+     main = "Actual vs Predicted Prices")
+abline(0, 1)
+
+# Create a residuals vs fitted values plot
+plot(fitted(model),
+     residuals(model) / decathlon$Points * 100,
+     xlab = "Fitted Values",
+     ylab = "Residuals (in %)",
+     main = "Residuals vs Fitted Values",
+     ylim = c(-6, 6))
+abline(h = 0, lty = 2)
+
+# From the plot of Residual vs Fitted Values we can see that all the values are
+# within a 6% of erro which means that the model is accurate.
