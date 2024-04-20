@@ -1,6 +1,7 @@
 ############################# PART 4
 
-install.packages("psych")
+library(lmtest)
+library(car)
 library(FactoMineR)
 library(corrplot)
 library(psych)
@@ -13,13 +14,16 @@ data(decathlon)
 # scores on the dimensions
 
 # As the variable "Competition" is not numerical, we can not use it for the PCA
-# so we remove it from the dataset. As we want to predict the variable "Rank,
-# it would make no sense to use it in the prediciont model, for this reason,
-# we elimnate it.
+# so we remove it from the dataset.
 normalized_data <- decathlon[, -13]
+# As we only want to use the values that are related with a discipline, and as
+# point is not related with a specific discipline: we remove it.
+normalized_data <- normalized_data[, -12]
+# As we want to predict the variable "Rank, it would make no sense to use it in
+# the prediciont model, for this reason, we elimnate it.
 normalized_data <- normalized_data[, -11]
 
-# Before performing the PCA we will check which Principal Components we should
+# Before performing the PCA we will check which Principal Components (PCs) we should
 # use with KMO test. The Kaiser-Meyer-Olkin (KMO) represents the degree to which
 # each observed variable is predicted by the other variables in the
 # dataset and with this indicates the suitability for factor analysis.
@@ -66,7 +70,7 @@ corrplot(correlation_matrix, method = "circle")
 n <- nrow(normalized_data)
 cortest.bartlett(correlation_matrix, n)
 
-# As the p-value (5.837618e-67) < 0.05 we have enough evidence to reject the
+# As the p-value (1.15685e-10) < 0.05 we have enough evidence to reject the
 # null hypothesys so the assumption of correlation between features is
 # fulfilled
 
@@ -79,11 +83,11 @@ kmo(normalized_data)
 normalized_data <- normalized_data[, -8]
 kmo(normalized_data)
 
-# As the KMO is still low we remove javeline
-normalized_data <- normalized_data[, -8]
+# As the KMO is still low we remove 1500m
+normalized_data <- normalized_data[, -9]
 kmo(normalized_data)
 
-# As the KMO is still low we remove 1500m
+# As the KMO is still low we remove javeline
 normalized_data <- normalized_data[, -8]
 kmo(normalized_data)
 
@@ -99,14 +103,14 @@ plot(pca, choix = "var")
 # 2 - It seems that the first two components are enough to explain the variance
 #     of the data overall
 
-# In order to know how many principal components are significant for the
+# In order to know how many PC are significant for the
 # analysis of the variance of the data.
 
-names(eigenvalues) <- colnames(normalized_data)
+names(eigenvalues) <- colnames(normalized_data) # OTODO: check na
 print(eigenvalues)
 
 # As we can see through the eigenvalues, only 100 meters and long jump have a
-# value higher than 1, so, we can conclude that these two principal components
+# value higher than 1, so, we can conclude that these two PCs
 # are enough to explain the variance of the data.
 
 # Moreover, we want to visually check the conclusion using the Scree Plot
@@ -123,8 +127,51 @@ plot(pca$eig[, 3],
 # most. We can see it through the cosen of the models.
 pca$var$cos2
 
-# As we can see the vast majority (6 out of 8) of the variables is more
-# explained by the first principal component. Except 'shot.put' and 'discus'
+# As we can see the vast majority (6 out of 7) of the variables is more
+# explained by the first PC. Except 'shot.put' and 'discus'
 # which are better explained by the second dimension. This could be related
 # to the fact that the disciplines are similar (both involves thrusting an
 # object) and measure the score in meter.
+
+# 2) Now we are going to continue with PC regression. We want
+#    to construct a linear regression model to predict the points of each
+#    athlete. To do so you must
+#    First  decide  the  number  of  principal  components  to  be  included
+#    in  the  regression  as  independent  variables. Justify your answer.
+#    Check the assumptions of the regression model.
+#    Is the prediction accurate enough?
+
+# As in the prvious section we have concluded that the first two principal
+# components (100m and Long.jumo) are enough to explain the variance of
+# the data.
+# We will perform the linerar model with these two PC as independent
+# variables.
+
+model <- lm(decathlon$Points ~ decathlon$`100m` + decathlon$Long.jump)
+summary(model) # adjusted R square 0.6035
+
+# Homosedasticity
+bptest(model)
+# Adjusted R-squared: 0.638
+
+# Normality of residuals
+plot(model, 2)
+shapiro.test(model$residuals)
+# In this case the p-val(0.4211)>0.05 so we have enough evidence for accepting
+# the null hypothesis, the assumption of normality in the residuals is
+# fulfilled.
+# Both from the Q-Q plot and from shapiro we can conclude that the residuals
+# are normally distributed.
+
+# No multicolinearity
+vif(model)
+# The correlation between 100m and Long.jump is 1.55864, we can state that the
+# assumption of not multicolinearity between the independent variables
+# (100m and Long.jump) is fulfilled
+
+# Independence of errors
+# We can use DurbinWatson test to verify the independence of errors
+dwtest(model)
+# The test yields a DW value equal to 1.70 means which confirms the independence
+# of errors
+
