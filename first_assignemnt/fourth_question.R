@@ -1,7 +1,9 @@
 ############################# PART 4
 
+install.packages("psych")
 library(FactoMineR)
 library(corrplot)
+library(psych)
 
 data(decathlon)
 
@@ -10,16 +12,17 @@ data(decathlon)
 # individuals charts to understand the relations between the different variables of interest and individuals
 # scores on the dimensions
 
-# Before performing the PCA we will check which Principal Components should we
+# As the variable "Competition" is not numerical, we can not use it for the PCA
+# so we remove it from the dataset. As we want to predict the variable "Rank,
+# it would make no sense to use it in the prediciont model, for this reason,
+# we elimnate it.
+normalized_data <- decathlon[, -13]
+normalized_data <- normalized_data[, -11]
+
+# Before performing the PCA we will check which Principal Components we should
 # use with KMO test. The Kaiser-Meyer-Olkin (KMO) represents the degree to which
 # each observed variable is predicted by the other variables in the
 # dataset and with this indicates the suitability for factor analysis.
-
-# As the variable "Competition" is not numerical, we can not use it for the PCA
-# so we remove it from the dataset. We also omit "Rank" as it is the variable
-# are aiming to predict.
-normalized_data <- decathlon[, -13]
-normalized_data <- normalized_data[, -11]
 
 # Next we normalize and center the date of the remaining colums
 normalized_data <- as.data.frame(scale(decathlon))
@@ -54,38 +57,74 @@ normalized_data$`1500m` <- max(normalized_data$`1500m`) - normalized_data$`1500m
 correlation_matrix <- cor(normalized_data)
 corrplot(correlation_matrix, method = "circle")
 
+# After the transformations all the variables follow the same direction.
+
+# Before starting the PCA analysis we have to check that the data fullfill
+# sphericity.
+# We can check sphericity using Bartlett test. Bartlett uses the correlation
+# matrix and the dimension of the data.
+n <- nrow(normalized_data)
+cortest.bartlett(correlation_matrix, n)
+
+# As the p-value (5.837618e-67) < 0.05 we have enough evidence to reject the
+# null hypothesys so the assumption of correlation between features is
+# fulfilled
+
 # KMO with normalized data
 kmo(normalized_data)
 
-# As the values are still very low we will remove the variable with the low KMO in order to improve the model.
+# As the values are still very low we will remove the variable with the low KMO
+# in order to improve the model.
 # First we remove pole.vault
-decathlon <- decathlon[, -8]
-kmo(decathlon)
+normalized_data <- normalized_data[, -8]
+kmo(normalized_data)
 
 # As the KMO is still low we remove javeline
-decathlon <- decathlon[, -8]
-kmo(decathlon)
+normalized_data <- normalized_data[, -8]
+kmo(normalized_data)
 
 # As the KMO is still low we remove 1500m
-decathlon <- decathlon[, -8]
-kmo(decathlon)
+normalized_data <- normalized_data[, -8]
+kmo(normalized_data)
 
-# With a KMO value of 0.74 we can state that this is a reasonable model to perform a PCA
+# With a KMO value of 0.74 we can state that this is a reasonable model to
+# perform a PCA
 
-# pca <- PCA(normalized_data)
+pca <- PCA(normalized_data)
+plot(pca, choix = "var")
 
-# print(pca)
+# Looking at the PCA we can state that:
+# 1 - The variable have a strong relation with the first dimensino which is
+#     explaining over 51% of the variance of the data.
+# 2 - It seems that the first two components are enough to explain the variance
+#     of the data overall
 
-# we can use KMO to test which PC should we use in a PCA, value should be 80 more or less. Nihan uses a function KMO from a professor (search)
+# In order to know how many principal components are significant for the
+# analysis of the variance of the data.
 
-# check pca$eig, look for eigenvalues greater than 1 --- "we can conclude that x PC are enough to explain the variance"
+names(eigenvalues) <- colnames(normalized_data)
+print(eigenvalues)
 
-# check plot(pca, choix = "var") and plot(pca, choix = "ind")
+# As we can see through the eigenvalues, only 100 meters and long jump have a
+# value higher than 1, so, we can conclude that these two principal components
+# are enough to explain the variance of the data.
 
-# we can check the flag axes = x to check different dimensions comparison
+# Moreover, we want to visually check the conclusion using the Scree Plot
+par(mfrow = c(1, 2))
+plot(pca$eig[, 2],
+     type = "b",
+     ylab = "Proportion of variance explained")
+plot(pca$eig[, 3],
+     type = "b",
+     ylim = c(0, max(pca$eig[, 3])),
+     ylab = "Cumulative Proportion of variance explained")
 
-# use dwtest() for checking independence of errors
+# Moreover, we want to know in which component are the variables explained the
+# most. We can see it through the cosen of the models.
+pca$var$cos2
 
-# check pca$var$cos2 to know in which component are the variables explained most
-
-# chech pca$var$contrib to know how each variable contribute to each dimension
+# As we can see the vast majority (6 out of 8) of the variables is more
+# explained by the first principal component. Except 'shot.put' and 'discus'
+# which are better explained by the second dimension. This could be related
+# to the fact that the disciplines are similar (both involves thrusting an
+# object) and measure the score in meter.

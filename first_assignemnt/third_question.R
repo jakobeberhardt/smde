@@ -258,6 +258,8 @@ vif(psg_model)
 # Now that we have chosen the most suitable factor to include in the model, we
 # can compare the without-factor and with-factor models with ANOVA.
 
+
+# TODO: test with dwtest
 anova(ps_model, psg_model)
 
 # The ANOVA test suggests that Model 2 provides a significantly better fit to
