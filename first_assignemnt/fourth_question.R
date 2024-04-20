@@ -53,7 +53,24 @@ normalized_data$`1500m` <- max(normalized_data$`1500m`) - normalized_data$`1500m
 
 correlation_matrix <- cor(normalized_data)
 corrplot(correlation_matrix, method = "circle")
+
+# KMO with normalized data
 kmo(normalized_data)
+
+# As the values are still very low we will remove the variable with the low KMO in order to improve the model.
+# First we remove pole.vault
+decathlon <- decathlon[, -8]
+kmo(decathlon)
+
+# As the KMO is still low we remove javeline
+decathlon <- decathlon[, -8]
+kmo(decathlon)
+
+# As the KMO is still low we remove 1500m
+decathlon <- decathlon[, -8]
+kmo(decathlon)
+
+# With a KMO value of 0.74 we can state that this is a reasonable model to perform a PCA
 
 # pca <- PCA(normalized_data)
 
