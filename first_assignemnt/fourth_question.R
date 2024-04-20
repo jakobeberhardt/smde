@@ -31,7 +31,6 @@ normalized_data <- normalized_data[, -11]
 # Next we normalize and center the date of the remaining colums
 normalized_data <- as.data.frame(scale(decathlon))
 
-# If we check the KMO, the data is clearly not yet sutiable for a PCA as it yields 0.1154019.
 kmo <- function(x)
 {
   x <- subset(x, complete.cases(x))       # Omit missing values
@@ -46,6 +45,7 @@ kmo <- function(x)
   return(list(KMO = KMO, MSA = MSA))
 }
 kmo(normalized_data)
+# If we check the KMO, the data is clearly not yet sutiable for a PCA as it yields 0.1154019.
 
 correlation_matrix <- cor(normalized_data)
 corrplot(correlation_matrix, method = "circle")
