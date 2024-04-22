@@ -23,30 +23,10 @@ normalized_data <- normalized_data[, -12]
 # the prediciont model, for this reason, we elimnate it.
 normalized_data <- normalized_data[, -11]
 
-# Before performing the PCA we will check which Principal Components (PCs) we should
-# use with KMO test. The Kaiser-Meyer-Olkin (KMO) represents the degree to which
-# each observed variable is predicted by the other variables in the
-# dataset and with this indicates the suitability for factor analysis.
-
 # Next we normalize and center the date of the remaining colums
 normalized_data <- as.data.frame(scale(decathlon))
 
-kmo <- function(x)
-{
-  x <- subset(x, complete.cases(x))       # Omit missing values
-  r <- cor(x)                             # Correlation matrix
-  r2 <- r^2                               # Squared correlation coefficients
-  i <- solve(r)                           # Inverse matrix of correlation matrix
-  d <- diag(i)                            # Diagonal elements of inverse matrix
-  p2 <- (-i/sqrt(outer(d, d)))^2          # Squared partial correlation coefficients
-  diag(r2) <- diag(p2) <- 0               # Delete diagonal elements
-  KMO <- sum(r2)/(sum(r2)+sum(p2))
-  MSA <- colSums(r2)/(colSums(r2)+colSums(p2))
-  return(list(KMO = KMO, MSA = MSA))
-}
-kmo(normalized_data)
-# If we check the KMO, the data is clearly not yet sutiable for a PCA as it yields 0.1154019.
-
+# Correlation matrix check
 correlation_matrix <- cor(normalized_data)
 corrplot(correlation_matrix, method = "circle")
 
@@ -73,6 +53,24 @@ cortest.bartlett(correlation_matrix, n)
 # As the p-value (1.15685e-10) < 0.05 we have enough evidence to reject the
 # null hypothesys so the assumption of correlation between features is
 # fulfilled
+
+# Before performing the PCA we will check which Principal Components (PCs) we should
+# use with KMO test. The Kaiser-Meyer-Olkin (KMO) represents the degree to which
+# each observed variable is predicted by the other variables in the
+# dataset and with this indicates the suitability for factor analysis.
+kmo <- function(x)
+{
+  x <- subset(x, complete.cases(x))       # Omit missing values
+  r <- cor(x)                             # Correlation matrix
+  r2 <- r^2                               # Squared correlation coefficients
+  i <- solve(r)                           # Inverse matrix of correlation matrix
+  d <- diag(i)                            # Diagonal elements of inverse matrix
+  p2 <- (-i/sqrt(outer(d, d)))^2          # Squared partial correlation coefficients
+  diag(r2) <- diag(p2) <- 0               # Delete diagonal elements
+  KMO <- sum(r2)/(sum(r2)+sum(p2))
+  MSA <- colSums(r2)/(colSums(r2)+colSums(p2))
+  return(list(KMO = KMO, MSA = MSA))
+}
 
 # KMO with normalized data
 kmo(normalized_data)
