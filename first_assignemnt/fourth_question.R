@@ -96,7 +96,7 @@ pca <- PCA(normalized_data)
 plot(pca, choix = "var")
 
 # Looking at the PCA we can state that:
-# 1 - The variable have a strong relation with the first dimensino which is
+# 1 - The variables have a strong relation with the first dimension which is
 #     explaining over 51% of the variance of the data.
 # 2 - It seems that the first two components are enough to explain the variance
 #     of the data overall
