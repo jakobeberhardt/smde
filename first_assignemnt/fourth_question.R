@@ -15,16 +15,16 @@ data(decathlon)
 
 # As the variable "Competition" is not numerical, we can not use it for the PCA
 # so we remove it from the dataset.
-normalized_data <- decathlon[, -13]
+data <- decathlon[, -13]
 # As we only want to use the values that are related with a discipline, and as
 # point is not related with a specific discipline: we remove it.
-normalized_data <- normalized_data[, -12]
+data <- data[, -12]
 # As we want to predict the variable "Rank, it would make no sense to use it in
 # the prediciont model, for this reason, we elimnate it.
-normalized_data <- normalized_data[, -11]
+data <- data[, -11]
 
 # Next we normalize and center the date of the remaining colums
-normalized_data <- as.data.frame(scale(decathlon))
+normalized_data <- as.data.frame(scale(data))
 
 # Correlation matrix check
 correlation_matrix <- cor(normalized_data)
