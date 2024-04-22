@@ -75,7 +75,7 @@ kmo <- function(x)
 # KMO with normalized data
 kmo(normalized_data)
 
-# As the values are still very low we will remove the variable with the low KMO
+# As the KMO is very low we will remove the variable with the low KMO
 # in order to improve the model.
 # First we remove pole.vault
 normalized_data <- normalized_data[, -8]
