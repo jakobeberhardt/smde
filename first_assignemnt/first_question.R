@@ -155,6 +155,24 @@ boxplot(Price ~ TypeName, data = ultra_note_df,
 # Notebook, the outliers are more expensive while in the case of Ultrabooks the
 # only outlier is cheaper.
 
+# Finding the outlier companies 
+# Filter data to include only Notebooks
+notebooks_df <- subset(ultra_note_df, TypeName == "Notebook")
+
+# Calculate the IQR and determine the upper boundary for outliers
+Q1 <- quantile(notebooks_df$Price, 0.25)
+Q3 <- quantile(notebooks_df$Price, 0.75)
+IQR <- Q3 - Q1
+
+upper_bound <- Q3 + 1.5 * IQR
+
+# Find the expensive outliers
+expensive_outliers <- notebooks_df[notebooks_df$Price > upper_bound, ]
+
+# Get the Company names of the expensive outliers
+expensive_outlier_companies <- expensive_outliers$Company
+expensive_outlier_companies
+
 ### i) Compare the average price of Ultrabooks and Notebooks by using the
 ###    appropriate method. Do not forget to test the assumptions.
 
