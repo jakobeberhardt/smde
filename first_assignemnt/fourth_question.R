@@ -15,16 +15,16 @@ data(decathlon)
 
 # As the variable "Competition" is not numerical, we can not use it for the PCA
 # so we remove it from the dataset.
-data <- decathlon[, -13]
+decathlon_filtered <- decathlon[, -13]
 # As we only want to use the values that are related with a discipline, and as
 # point is not related with a specific discipline: we remove it.
-data <- data[, -12]
+decathlon_filtered <- decathlon_filtered[, -12]
 # As we want to predict the variable "Rank, it would make no sense to use it in
 # the prediciont model, for this reason, we elimnate it.
-data <- data[, -11]
+decathlon_filtered <- decathlon_filtered[, -11]
 
 # Next we normalize and center the date of the remaining colums
-normalized_data <- as.data.frame(scale(data))
+normalized_data <- as.data.frame(scale(decathlon_filtered))
 
 # Correlation matrix check
 correlation_matrix <- cor(normalized_data)
@@ -85,11 +85,7 @@ kmo(normalized_data)
 normalized_data <- normalized_data[, -9]
 kmo(normalized_data)
 
-# As the KMO is still low we remove javeline
-normalized_data <- normalized_data[, -8]
-kmo(normalized_data)
-
-# With a KMO value of 0.74 we can state that this is a reasonable model to
+# With a KMO value of 0.735 we can state that this is a reasonable model to
 # perform a PCA
 
 pca <- PCA(normalized_data)
@@ -102,24 +98,28 @@ plot(pca, choix = "var")
 #     of the data overall
 
 # In order to know how many PC are significant for the
-# analysis of the variance of the data.
-
-names(eigenvalues) <- colnames(normalized_data) # OTODO: check na
-print(eigenvalues)
+# analysis of the variance of the data, we can use the eigenvalues.
+print(pca$eig)
 
 # As we can see through the eigenvalues, only 100 meters and long jump have a
-# value higher than 1, so, we can conclude that these two PCs
+# value higher than 1, so we can conclude that these two PCs
 # are enough to explain the variance of the data.
 
 # Moreover, we want to visually check the conclusion using the Scree Plot
 par(mfrow = c(1, 2))
 plot(pca$eig[, 2],
      type = "b",
-     ylab = "Proportion of variance explained")
+     ylab = "Proportion of variance explained",
+     xaxt = "n")
+custom_labels <- c("100m", "Long.jump", "Shot.put", "High.jump", "400m",
+                   "110m.hurdle", "Discus", "Javeline")
+axis(1, at = 1:length(custom_labels), labels = custom_labels)
 plot(pca$eig[, 3],
      type = "b",
      ylim = c(0, max(pca$eig[, 3])),
-     ylab = "Cumulative Proportion of variance explained")
+     ylab = "Cumulative Proportion of variance explained (in %)",
+     xaxt = "n")
+axis(1, at = 1:length(custom_labels), labels = custom_labels)
 par(mfrow = c(1, 1))
 
 # Moreover, we want to know in which component are the variables explained the
@@ -151,7 +151,7 @@ summary(model) # adjusted R square 0.6035
 
 # Homosedasticity
 bptest(model)
-# Adjusted R-squared: 0.638
+# Adjusted R-squared: 0.727
 
 # Normality of residuals
 plot(model, 2)
@@ -184,8 +184,7 @@ predictions <- predict(model, decathlon)
 plot(decathlon$Points,
      predictions,
      xlab = "Actual Rank",
-     ylab = "Predicted Rank",
-     main = "Actual vs Predicted Prices")
+     ylab = "Predicted Rank")
 abline(0, 1)
 
 # Create a residuals vs fitted values plot
@@ -193,7 +192,6 @@ plot(fitted(model),
      residuals(model) / decathlon$Points * 100,
      xlab = "Fitted Values",
      ylab = "Residuals (in %)",
-     main = "Residuals vs Fitted Values",
      ylim = c(-6, 6))
 abline(h = 0, lty = 2)
 
