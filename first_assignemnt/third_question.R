@@ -61,12 +61,6 @@ bptest(ow_model)
 # As the p-val<0.05 we have enough evidence for rejecting the null hypothesis,
 # so we can state that the Homoscedasticity assumption is not fulfilled.
 
-## Normality of the residuals
-plot(ow_model, 2)
-shapiro.test(ow_model$residuals)
-# As the pval(3.73e-09)<0.05 we have enough evidence to reject the null
-# hypothesis, the assumption of normality of the residuals is not fulfilled.
-
 ### Only Ppi
 op_model <- lm(Price ~ Ppi, data = data)
 summary(op_model)
@@ -86,6 +80,11 @@ shapiro.test(op_model$residuals)
 # the null hypothesis, the assumption of normality in the residuals is
 # fulfilled.
 
+## Independence of erros
+dwtest(op_model)
+# The test yields a DW value equal to 2.05 which confirms the independence
+# of errors
+
 ### Only SSD
 os_model <- lm(Price ~ SSD, data = data)
 summary(os_model)
@@ -101,6 +100,11 @@ plot(os_model, 2)
 shapiro.test(os_model$residuals)
 # With these tests we can be sure that residuals follow a normal distribution
 # (p-val>0.05).
+
+## Independence of erros
+dwtest(os_model)
+# The test yields a DW value equal to 2.04 means which confirms the independence
+# of errors
 
 # In this case we can see that SSD is a better predictor than Ppi for Price. We
 # do not take weight into account as it does not fulfill the assumptions and
