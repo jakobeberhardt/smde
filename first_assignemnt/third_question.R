@@ -49,7 +49,6 @@ data <- read.csv(file_path, colClasses = col_classes)
 
 ### Only Weight
 ow_model <- lm(Price ~ Weight, data = data)
-plot(ow_model)
 summary(ow_model)
 # Adjusted R-squared: 0.02215
 
@@ -63,6 +62,8 @@ bptest(ow_model)
 
 ### Only Ppi
 op_model <- lm(Price ~ Ppi, data = data)
+coefficients <- coef(op_model)
+print(op_model)
 summary(op_model)
 # Adjusted R-squared: 0.2305
 
@@ -87,6 +88,8 @@ dwtest(op_model)
 
 ### Only SSD
 os_model <- lm(Price ~ SSD, data = data)
+coefficients <- coef(os_model)
+print(os_model)
 summary(os_model)
 # Adjusted R-squared: 0.4336
 
@@ -133,7 +136,6 @@ shapiro.test(wp_model$residuals)
 # The assumption of normality of the residuals is not fulfilled as the
 # p-val(0.0014)<0.05, the results of this model are not reliable.
 
-
 ### Weight + SSD
 ws_model <- lm(Price ~ Weight + SSD, data = data)
 summary(ws_model)
@@ -169,7 +171,8 @@ shapiro.test(ps_model$residuals)
 # In order to test correlation we can check the variance inflation factor
 vif(ps_model)
 # The correlation between Ppi and SSD is 1.33, we can state that the assumption
-# of not multicolinearity between the independent variables (Ppi and SSD) is fulfilled
+# of not multicolinearity between the independent variables (Ppi and SSD) is
+# fulfilled
 
 ## Independence of erros
 # We can use DurbinWatson test to verify the independence of errors
@@ -188,7 +191,7 @@ anova(ps_model, os_model)
 # the data compared to Model 2.
 # This conclusion is based on the significantly lower residual sum of squares
 # (RSS) and the associated F-statistic with
-# a very low p-value (***), indicating strong evidence against the null
+# a very low p-value (2.2e-16), indicating strong evidence against the null
 # hypothesis.
 
 # c) Now add a factor to the regression model you have chosen in section (b). (You can write a loop
@@ -248,6 +251,10 @@ bptest(psr_model)
 
 pst_model <- lm(Price ~ Ppi + SSD + TypeName, data = data)
 
+## Assumptions check
+
+## Homoscedasticity:
+bptest(pst_model)
 # As this model (TypeName) fails the assumption of homoscedasticity we will
 # continue the analysis with the second best explanatory factor: Gpu_brand
 
@@ -288,7 +295,7 @@ anova(ps_model, psg_model)
 # the data compared to Model 1,  what means that adding the factor Gpu_brand is
 # better for explaining the variation in the response variable 'Price'.
 # This conclusion is based on the significantly lower residual sum of squares
-# (RSS) and the associated F-statistic with a very low p-value (***),
+# (RSS) and the associated F-statistic with a very low p-value (2.2e-16),
 # indicating strong evidence against the null hypothesis.
 
 # d) Test the validity of the final model. (15p)
@@ -302,8 +309,7 @@ plot(data$Price,
      xlab = "Actual Prices",
      ylab = "Predicted Prices",
      main = "Actual vs Predicted Prices")
-abline(0, 1)
-
+abline(0, 1, col = "red", lwd = 4)
 
 # Create a residuals vs fitted values plot
 plot(fitted(psg_model),
@@ -332,3 +338,11 @@ results <- data.frame(
 
 print(results)
 
+### Comparison of the model yielded
+
+plot(fitted(os_model), residuals(os_model), xlab = "Fitted Values", ylab = "Residuals", main = "Residuals vs Fitted Values", col = "red", pch = 20)
+points(fitted(ps_model), residuals(ps_model), col = "blue", pch = 20)
+points(fitted(psg_model), residuals(psg_model), col = "green", pch = 20)
+abline(h = 0, lty = 2)
+
+legend("topright", legend = c("os_model", "ps_model", "psg_model"), col = c("red", "blue", "green"), pch = 20)
