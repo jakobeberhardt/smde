@@ -113,9 +113,9 @@ shapiro.test(log_clean_data)
 # Now we will proceed with performing the ANOVA test.
 model <- aov(filtered_data$Price ~ filtered_data$Company)
 summary(model)
-# With a p-value of 2e-16, we have enough evidence to reject 
-# the null-hypothesis. This means at least one mean is significantly 
-# different. 
+# With a p-value of 2e-16, we have enough evidence to reject
+# the null-hypothesis. This means at least one mean is significantly
+# different.
 
 # We can apply a TukeyHSD post-hoc test to check which and how groups differ
 # from each other
@@ -171,8 +171,8 @@ leveneTest(model)
 # The independence of observations is tested using the Durbin-Watson test.
 dwtest(model)
 
-# The test yields a p-value of 0.1393, hence, we reject the null hypothesis
-# which means that the observations are independent.
+# The test yields a p-value of 0.1393, hence, we fail to reject the null
+# hypothesis which means that the observations are independent.
 
 # All the assumptions for ANOVA are hence verified for the price.
 
@@ -182,17 +182,18 @@ dwtest(model)
 
 # As demonstrated previously (section b) price is normal. Hence, we proceed to
 # use anova to verify the interaction of the two terms.
-
 model_interaction <- aov(filtered_data$Price ~
-                           filtered_data$Cpu_brand * filtered_data$TouchScreen)
+                           filtered_data$Company * filtered_data$TouchScreen)
 
 plot(model_interaction, 2)
 leveneTest(model_interaction)
 
-# On the qqplot we can see that the values are not following a normal
-# distribution. Furthermore if we check the Levene's test on the interaction
-# model we see that we have enough evidence to reject the null hypothesis of
-# homoscedasticity, so the assumption is not fulfilled
+
+# On the qqplot we can see that the values are following a normal
+# distribution. Furthermore, if we check the Levene's test on the interaction
+# model we see that we get a p-value of 0.46.
+
+dwtest(model_interaction)
 
 # As we fail to verify the assumptions we can not consider the ANOVA test for
 # further conclusions.
