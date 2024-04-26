@@ -204,6 +204,6 @@ summary(model_interaction)
 # The test is significant for this model in both variables (***), hence, we have enough evidence to reject the null hypothesis. 
 # This means at least one mean is significantly different. 
 
-# We now apply Tukey's as a post-hoc test in order to know more about this differences..
+# We now apply Tukey's as a post-hoc test in order to know more about this differences.
 TukeyHSD(model_interaction)
 # The results obtaied show that all of the differences are significant, the values agree with the conclusion taken previously.
