@@ -195,5 +195,14 @@ leveneTest(model_interaction)
 
 dwtest(model_interaction)
 
-# As we fail to verify the assumptions we can not consider the ANOVA test for
-# further conclusions.
+# It yields a Durbin-Watson value of 1.92, which is sufficiently close to 2 and hence confirms the 
+# independence of errors.
+
+# As the assumptions are fulfilled we can proceed with the conclusions
+summary(model_interaction)
+# The test is significant for this model in both variables (***), hence, we have enough evidence to reject the null hypothesis. 
+# This means at least one mean is significantly different. 
+
+# We now apply Tukey's as a post-hoc test in order to know more about this differences..
+TukeyHSD(model_interaction)
+The results obtaied show that all of the differences are significant, the values agree with the conclusion taken previously.
