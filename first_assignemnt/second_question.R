@@ -206,4 +206,4 @@ summary(model_interaction)
 
 # We now apply Tukey's as a post-hoc test in order to know more about this differences..
 TukeyHSD(model_interaction)
-The results obtaied show that all of the differences are significant, the values agree with the conclusion taken previously.
+# The results obtaied show that all of the differences are significant, the values agree with the conclusion taken previously.
