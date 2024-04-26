@@ -185,14 +185,15 @@ dwtest(model)
 model_interaction <- aov(filtered_data$Price ~
                            filtered_data$Company * filtered_data$TouchScreen)
 
+# In order to check homogeneity of variances we can use a qqplot:
 plot(model_interaction, 2)
 leveneTest(model_interaction)
-
 
 # On the qqplot we can see that the values are following a normal
 # distribution. Furthermore, if we check the Levene's test on the interaction
 # model we see that we get a p-value of 0.46.
 
+# The independence of observations is tested using the Durbin-Watson test.
 dwtest(model_interaction)
 
 # It yields a Durbin-Watson value of 1.92, which is sufficiently close to 2 and hence confirms the 
