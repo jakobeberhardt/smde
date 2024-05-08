@@ -1,0 +1,29 @@
+
+        GENERATE    0,0,0,5       ; Customers arrive
+        ADVANCE     30,4
+        QUEUE       Line        ; Enter the line
+        SEIZE       DRINKS      ; Capture the barber
+        DEPART      Line        ; Leave the line
+        ADVANCE     2,1        ; Use the barber
+        RELEASE     DRINKS      ; Free the barber
+        
+        ADVANCE     30,4
+        
+        QUEUE       Line2        ; Enter the line
+        SEIZE       DRINKS2      ; Capture the barber
+        DEPART      Line2        ; Leave the line
+        ADVANCE     2,1        ; Use the barber
+        RELEASE     DRINKS2      ; Free the barber
+        
+        ADVANCE     30,4
+        
+        QUEUE       Line3        ; Enter the line
+        SEIZE       DRINKS3      ; Capture the barber
+        DEPART      Line3        ; Leave the line
+        ADVANCE     2,1        ; Use the barber
+        RELEASE     DRINKS3      ; Free the barber
+        TERMINATE    1          ; Shut off the run
+
+; Control
+        START       1           ; Start the run
+        END                     ; Exit the program
