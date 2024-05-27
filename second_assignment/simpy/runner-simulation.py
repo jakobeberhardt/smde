@@ -1,6 +1,6 @@
 import numpy
 import simpy
-
+import random
 
 
 class MonitoredResource(simpy.Resource):
@@ -25,36 +25,39 @@ class MonitoredResource(simpy.Resource):
 
 
 class Runner(object):
-    def __init__(self, env, water_queue):
+    def __init__(self, env, distances, queues, usage_times,  name):
         self.env = env
         # Start the run process everytime an instance is created.
         self.action = env.process(self.run())
-        self.water_queue = water_queue
+        self.distances = distances
+        self.queues = queues
+        self.usage_times = usage_times
+        self.name = name
 
     def run(self):
-        print("%d Start marathon" % self.env.now)
+        # print("{} {} Start marathon".format( self.env.now, self.name))
+        for i in range(0, len(self.distances)):
+            # print("{} starting stage {}".format(self.env.now , i))
+            yield self.env.timeout(running_time(self.distances[i]))
+            yield from self.use_stations(i)
+            
+    def use_stations(self, index):
+        keys =  list(self.queues[index].keys())
+        random.shuffle(keys)
+        print(keys)
+        for station in keys:
+            with self.queues[index][station].request() as stn:
+                yield stn
+                print("{} {}: start using {}".format(self.env.now, self.name, station))
+                yield self.env.timeout(self.usage_times[station]())
+                print("{} {}: stop using {}".format(self.env.now, self.name, station))
 
-        # to wait for it to finish
-        yield self.run_stage()
-        print("%d ran 10k" % self.env.now)
-        with self.water_queue.request() as req:
-            yield req
-            print("%d starting to drink water" % self.env.now)
-            yield self.env.timeout(water_drinking_time())
-            print("%d finished drinking water" % self.env.now)
-
-    def run_stage(self):
-        return self.env.timeout(running_time())
 
 
-
-running_time = lambda: numpy.random.normal(
-    11933.0 / 4.2, 1200 / 4.2
-)
+running_time = lambda distance: numpy.random.normal(11933.0 / 42.0 * distance, 1200 / 42.0 * distance)
 water_drinking_time = lambda: max(numpy.random.normal(30, 5), 5)
 meal_time = lambda: max(numpy.random.normal(60, 15), 10)
 toilet_time = lambda: max(numpy.random.normal(45, 10), 10)
-
 
 
 env = simpy.Environment()
@@ -67,31 +70,33 @@ resources = [
     {
         "meal": MonitoredResource(env, 10),
         "water": MonitoredResource(env, 10),
-        "toilet": MonitoredResource(env, 10)
+        "toilet": MonitoredResource(env, 10),
     },
     {
         "meal": MonitoredResource(env, 10),
         "water": MonitoredResource(env, 10),
-        "toilet": MonitoredResource(env, 10)
+        "toilet": MonitoredResource(env, 10),
     },
     {
         "meal": MonitoredResource(env, 10),
         "water": MonitoredResource(env, 10),
-        "toilet": MonitoredResource(env, 10)
+        "toilet": MonitoredResource(env, 10),
     },
     {
         "meal": MonitoredResource(env, 10),
         "water": MonitoredResource(env, 10),
-        "toilet": MonitoredResource(env, 10)
-    }
+        "toilet": MonitoredResource(env, 10),
+    },
 ]
 
+usage_times = {"water": water_drinking_time, "meal": meal_time, "toilet": toilet_time}
 
+distances = [10.0, 10.0, 10.0, 10.0]
 
 # create 200 runners
 
-for i in range(1, 1000):
-    Runner(env, water_queue=resources[0]["water"])
+for i in range(1, 2):
+    Runner(env, distances= distances, queues=resources, usage_times= usage_times, name= "runner %i" % i)
 
 
 # running simulation
